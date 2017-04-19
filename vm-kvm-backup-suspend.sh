@@ -4,16 +4,23 @@
 #
 # Backup of kvm vms
 # Needed ssh key to connect on target via rsync
+# week_day day of week, 1 start on monday
 #
 # ------------------------------------------------------------------
 
 if [ $# -lt 1 ]; then
-    echo $0: usage: $0 "rsync_destination"
+    echo $0: usage: $0 "rsync_destination <week_day>"
     exit 1
 fi
 
 rsync_target="$1"
 with_suspend=0
+week_day=$2
+
+day_current=`date +%u`
+if [ -n "$week_day" ] && [ "$week_day" -ne "$day_current" ]; then
+    exit
+fi
 
 virsh list | tail -n+3 | sed '/^$/d' | while read m; do
     vm_name=`echo $m | awk '{print $2}'`;
